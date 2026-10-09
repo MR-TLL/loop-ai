@@ -1,0 +1,17 @@
+server:
+  port: "8080"
+
+database:
+  host: "localhost"
+  port: 5432
+  user: "postgres"
+  password: "postgrespassword"
+  name: "appdb"
+  sslmode: "disable"
+  max_open_conns: 25
+  max_idle_conns: 10
+  conn_max_lifetime_mins: 5
+
+booking:
+  hold_expiry_secs: 300
+  expiry_poll_interval_secs: 30

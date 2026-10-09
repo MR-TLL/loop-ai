@@ -1,0 +1,96 @@
+slot booking application
+
+where user is coming in the application to book available slots for appointment -
+
+no need to worry about the no of doctors - assume that a clinic can process atmost one patient in a slot.
+
+application will handle multiple clinics though -
+
+Payment interface will be mocked
+
+
+For auto expiry , we will have a cron job in the backend (thread) that will at a specifinc interval keep on polling the Reservations table to check if there are aany reservations with slots in HOLD state for a long time , if found the reservation will be cancelled and the slot will be freed
+
+- take locks in the SQL DB to make sure only one thread of a application instance runs for cleanup.
+
+
+
+
+a. doctor appointment application
+b. multiple slots / intervals availble for user (1 hr window for start) - can be day wise cofigurable i.e. depending upon the day the intervals are differnt
+c. each slot can have multiple stages avaialble , hold , booked , cancelled -> avaialble - slot state machine is defined
+d. concurrency andlin gwhile booking slots
+e. auto expire hold slots after a fixed amount of time.
+f. payment cna be mocked, hold state happens on pending payment , after payment -> it goes to booked -> booked to cancelled is possible, but if payment not done for some time then move from hold to available.
+
+Data models - ( CreatedAt / UpdatedAT Presnet ni nall entitites )
+
+Clinics -
+ - Name
+ - Id (UUID ) PK
+ - Location / Address
+
+Slots -
+ - ID PK
+ - ClinicId
+ - StartTime
+ - EndTime
+ - State - > Availble , hold , booked , cancelled
+ - UpdatedaAt
+
+User -
+- ID PK
+ - Name
+ - Adress -
+ ... Other medical details
+
+Reservation -
+- ID
+- UserID
+- ClinicId
+- SlotId
+- PaymentStatusId
+- CreatedId X  5 mins -  Y > x + 5 mins then de reserve the slot and remove the reservation
+
+PaymentStatus -
+- ID
+- Status
+- Amount
+-
+
+
+APIs -
+
+/api/v1/{clinicID}  / Get clinic info
+
+/api/vi/{clinicId}/Slots GET all available slots
+
+/api/v1/{slotId}/hold  - POST it will try to hold a avialble slot
+
+/api/v1/{slotID}/book  - POST update the payament status and put the slot in booked state
+
+
+
+for slot concurrency -
+
+FOR UPDATE STMT -> EXCLUSION PART ->
+
+Clind -> slot ->
+
+
+Review comments -
+
+why use skip locked ?
+
+there is no /cancel endpoint so hold-> canceleld is not possible
+
+
+rename serice layer in go backend to controller , follow the mvc pattern
+
+
+for all status keep an inVALID status at the first -
+
+i do not see transaction start / stop layer in repository , will be needded for atomic operations , i see you are taking a tx in input but where is the tx handle coming form i do not see any method that starts a transaction
+
+
+expiredSlot should get calculated by checking the reservation entity start time that has taken hold of that slot not via the slot createdAt / updatedAt

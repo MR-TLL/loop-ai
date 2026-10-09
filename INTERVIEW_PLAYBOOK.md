@@ -6,7 +6,7 @@ This guide is tailored specifically to the evaluation rubric of your interview. 
 
 ## 1. Architectural Blueprint (Go + Postgres + React)
 
-A standard, clean architecture that interviewers respect:
+A standard, clean architecture that interviewers respect: --- 
 
 ```
 frontend/ (React + TypeScript + Vite)
